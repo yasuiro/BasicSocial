@@ -19,6 +19,13 @@
 		FEEF109A1959687100ACEC76 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FEEF10821959687100ACEC76 /* UIKit.framework */; };
 		FEEF10A21959687100ACEC76 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = FEEF10A01959687100ACEC76 /* InfoPlist.strings */; };
 		FEEF10A41959687100ACEC76 /* BasicSocialTests.m in Sources */ = {isa = PBXBuildFile; fileRef = FEEF10A31959687100ACEC76 /* BasicSocialTests.m */; };
+		FEEF10AE1959689100ACEC76 /* Social.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FEEF10AD1959689100ACEC76 /* Social.framework */; };
+		FEEF10B01959689700ACEC76 /* Accounts.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FEEF10AF1959689700ACEC76 /* Accounts.framework */; };
+		FEEF10B3195968BD00ACEC76 /* RootViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FEEF10B2195968BD00ACEC76 /* RootViewController.m */; };
+		FEEF10B619596A2900ACEC76 /* Status.m in Sources */ = {isa = PBXBuildFile; fileRef = FEEF10B519596A2900ACEC76 /* Status.m */; };
+		FEEF10B819598F8E00ACEC76 /* RootViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = FEEF10B719598F8E00ACEC76 /* RootViewController.xib */; };
+		FEEF10BC1959908300ACEC76 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FEEF10BA1959908300ACEC76 /* ViewController.m */; };
+		FEEF10BD1959908300ACEC76 /* ViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = FEEF10BB1959908300ACEC76 /* ViewController.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -48,6 +55,16 @@
 		FEEF109F1959687100ACEC76 /* BasicSocialTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "BasicSocialTests-Info.plist"; sourceTree = "<group>"; };
 		FEEF10A11959687100ACEC76 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		FEEF10A31959687100ACEC76 /* BasicSocialTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BasicSocialTests.m; sourceTree = "<group>"; };
+		FEEF10AD1959689100ACEC76 /* Social.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Social.framework; path = System/Library/Frameworks/Social.framework; sourceTree = SDKROOT; };
+		FEEF10AF1959689700ACEC76 /* Accounts.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accounts.framework; path = System/Library/Frameworks/Accounts.framework; sourceTree = SDKROOT; };
+		FEEF10B1195968BD00ACEC76 /* RootViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RootViewController.h; sourceTree = "<group>"; };
+		FEEF10B2195968BD00ACEC76 /* RootViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RootViewController.m; sourceTree = "<group>"; };
+		FEEF10B419596A2900ACEC76 /* Status.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Status.h; sourceTree = "<group>"; };
+		FEEF10B519596A2900ACEC76 /* Status.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Status.m; sourceTree = "<group>"; };
+		FEEF10B719598F8E00ACEC76 /* RootViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = RootViewController.xib; sourceTree = "<group>"; };
+		FEEF10B91959908300ACEC76 /* ViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
+		FEEF10BA1959908300ACEC76 /* ViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
+		FEEF10BB1959908300ACEC76 /* ViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ViewController.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -55,6 +72,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FEEF10B01959689700ACEC76 /* Accounts.framework in Frameworks */,
+				FEEF10AE1959689100ACEC76 /* Social.framework in Frameworks */,
 				FEEF10811959687100ACEC76 /* CoreGraphics.framework in Frameworks */,
 				FEEF10831959687100ACEC76 /* UIKit.framework in Frameworks */,
 				FEEF107F1959687100ACEC76 /* Foundation.framework in Frameworks */,
@@ -96,6 +115,8 @@
 		FEEF107D1959687100ACEC76 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				FEEF10AF1959689700ACEC76 /* Accounts.framework */,
+				FEEF10AD1959689100ACEC76 /* Social.framework */,
 				FEEF107E1959687100ACEC76 /* Foundation.framework */,
 				FEEF10801959687100ACEC76 /* CoreGraphics.framework */,
 				FEEF10821959687100ACEC76 /* UIKit.framework */,
@@ -111,6 +132,14 @@
 				FEEF108E1959687100ACEC76 /* AppDelegate.m */,
 				FEEF10901959687100ACEC76 /* Images.xcassets */,
 				FEEF10851959687100ACEC76 /* Supporting Files */,
+				FEEF10B1195968BD00ACEC76 /* RootViewController.h */,
+				FEEF10B2195968BD00ACEC76 /* RootViewController.m */,
+				FEEF10B719598F8E00ACEC76 /* RootViewController.xib */,
+				FEEF10B419596A2900ACEC76 /* Status.h */,
+				FEEF10B519596A2900ACEC76 /* Status.m */,
+				FEEF10B91959908300ACEC76 /* ViewController.h */,
+				FEEF10BA1959908300ACEC76 /* ViewController.m */,
+				FEEF10BB1959908300ACEC76 /* ViewController.xib */,
 			);
 			path = BasicSocial;
 			sourceTree = "<group>";
@@ -221,6 +250,8 @@
 			files = (
 				FEEF10891959687100ACEC76 /* InfoPlist.strings in Resources */,
 				FEEF10911959687100ACEC76 /* Images.xcassets in Resources */,
+				FEEF10BD1959908300ACEC76 /* ViewController.xib in Resources */,
+				FEEF10B819598F8E00ACEC76 /* RootViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -241,6 +272,9 @@
 			files = (
 				FEEF108F1959687100ACEC76 /* AppDelegate.m in Sources */,
 				FEEF108B1959687100ACEC76 /* main.m in Sources */,
+				FEEF10B3195968BD00ACEC76 /* RootViewController.m in Sources */,
+				FEEF10B619596A2900ACEC76 /* Status.m in Sources */,
+				FEEF10BC1959908300ACEC76 /* ViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -360,6 +394,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "BasicSocial/BasicSocial-Prefix.pch";
 				INFOPLIST_FILE = "BasicSocial/BasicSocial-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -373,6 +408,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "BasicSocial/BasicSocial-Prefix.pch";
 				INFOPLIST_FILE = "BasicSocial/BasicSocial-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
