@@ -7,7 +7,20 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <Social/Social.h>
+#import <Accounts/Accounts.h>
+#import "AccountListViewController.h"
 
-@interface RootViewController : UIViewController
+@interface RootViewController : UIViewController <AccountListViewControllerDelegate>
+{
+    BOOL _portrate;
+    
+    ACAccountStore *_accountStore;
+    ACAccount *_twitterAccount;
+    ACAccount *_facebookAccount;
+    
+    NSMutableArray *_items;
+}
+
 
 @end

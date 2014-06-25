@@ -7,8 +7,7 @@
 //
 
 #import "RootViewController.h"
-#import <Social/Social.h>
-#import <Accounts/Accounts.h>
+
 
 
 
@@ -17,17 +16,13 @@
 //--------------------------------------------------------------------------------------------------
 #pragma mark - interface of RootViewController
 
-@interface RootViewController () <UITableViewDelegate, UITableViewDataSource, UITextFieldDelegate>
-{
-    UITableView *_tableView;
-    BOOL _portrate;
-    
-    ACAccountStore *_accoountStore;
-    ACAccount *_account;
-    NSMutableArray *_items;
-}
+@interface RootViewController ()
+
 
 @property (strong, nonatomic) IBOutlet UIButton *twitterButton;
+@property (strong, nonatomic) IBOutlet UIButton *tweetButton;
+@property (strong, nonatomic) IBOutlet UIButton *shareButton;
+@property (strong, nonatomic) IBOutlet UIButton *facebookButton;
 
 @end
 
@@ -105,18 +100,20 @@
 
 - (void)initialize
 {
-    self.title = @"Twitterクライアント";
     UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
     _portrate = UIInterfaceOrientationIsPortrait(orientation);
     
     _items = [NSMutableArray array];
     
     [self initTwitterButton];
+    [self initTweetButton];
+    [self initFacebookButton];
+    [self initShareButton];
 }
 
 
 //--------------------------------------------------------------------------------------------------
-#pragma mark - 
+#pragma mark - util
 
 //データ->文字列
 - (NSString *)data2str:(NSData *)data
@@ -164,27 +161,18 @@
 
 
 
-- (void)initTwitterAccount
+- (void)createAccountStore
 {
-    _account = nil;
-    _accoountStore = [[ACAccountStore alloc] init];
-    ACAccountType *twitterType = [_accoountStore accountTypeWithAccountTypeIdentifier:ACAccountTypeIdentifierTwitter];
-    [_accoountStore requestAccessToAccountsWithType:twitterType
-                                            options:nil
-                                         completion:^(BOOL granted, NSError *error) {
-                                             if (granted) {
-                                                 NSArray *accounts = [_accoountStore accountsWithAccountType:twitterType];
-                                                 if (accounts.count > 0) {
-                                                     _account = [accounts objectAtIndex:0];
-//                                                     [self timeline];
-                                                     
-                                                     return;
-                                                 }
-                                             }
-                                             [self showAlert:@"" text:@"Twitterアカウントが登録されていません"];
-                                         }];
+    if (_accountStore == nil) {
+        _accountStore = [[ACAccountStore alloc] init];
+    }
 }
 
+
+
+
+//--------------------------------------------------------------------------------------------------
+#pragma mark - Twitter
 
 - (void)initTwitterButton
 {
@@ -193,34 +181,213 @@
 
 - (void)onTapTwitterButton:(id)sender
 {
-    [self initTwitterAccount];
+    [self fetchTwitterAccount];
 }
 
 
-//--------------------------------------------------------------------------------------------------
-#pragma mark - UITableViewDelegate
-
-
-
-//--------------------------------------------------------------------------------------------------
-#pragma mark - UITableViewDataSource
-
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+- (void)fetchTwitterAccount
 {
-    UITableViewCell *cell;
+    _twitterAccount = nil;
+    [self createAccountStore];
     
+    BOOL isTwitter = [SLComposeViewController isAvailableForServiceType:SLServiceTypeTwitter];
+    if (!isTwitter) {
+        [self showAlert:@"Twitterアカウントが\n登録されていません" text:@"設定>Twitter より\nアカウントを登録してください。"];
+        return;
+    }
     
-    return cell;
+    //アカウント種別の取得
+    ACAccountType *twitterType = [_accountStore accountTypeWithAccountTypeIdentifier:ACAccountTypeIdentifierTwitter];
+    
+    //アカウントの取得
+    [_accountStore requestAccessToAccountsWithType:twitterType
+        options:nil
+        completion:^(BOOL granted, NSError *error) {
+            //このcompletionブロックはメインスレッドではないため,UI操作などをするためにメインスレッドで動作するようにする。
+            dispatch_async(dispatch_get_main_queue(), ^{
+                //アカウント認証を許可した場合はgrandtedがYESとなる。
+                //一度設定するとアラート画面がでなくなるので、ユーザー自身で設定画面から変更してもらう必要がある。
+                if (granted) {
+                    NSArray *accounts = [_accountStore accountsWithAccountType:twitterType];
+                    if (accounts.count > 0) {
+                        if (accounts.count == 1) {
+                            _twitterAccount = accounts[0];
+                        } else {
+                            [self createAccountList:accounts];
+                        }
+                        return;
+                    }
+                }
+                
+                //アカウントが登録されていないか、許可していない場合。
+                [self showAlert:@"" text:@"Twitterアカウントが登録されていません"];
+            });
+        }];
 }
 
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
-{
-    return 10;
-}
 
 
 //--------------------------------------------------------------------------------------------------
-#pragma mark - UITextFieldDelegate
+#pragma mark - Facebook
+
+- (void)initFacebookButton
+{
+    [self.facebookButton addTarget:self action:@selector(onTapFacebookButton:) forControlEvents:UIControlEventTouchUpInside];
+}
+
+- (void)onTapFacebookButton:(id)sender
+{
+    [self fetchFacebookAccount];
+}
+
+- (void)fetchFacebookAccount
+{
+    _facebookAccount = nil;
+    [self createAccountStore];
+    
+    BOOL isFacebook = [SLComposeViewController isAvailableForServiceType:SLServiceTypeFacebook];
+    if (!isFacebook) {
+        [self showAlert:@"Facebookアカウントが\n登録されていません" text:@"設定>Facebook より\nアカウントを登録してください。"];
+        //prefs:root=FACEBOOK
+//        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"prefs://"]];
+        return;
+    }
+    
+    //337191383103732
+    //ab8b63ce9e5a89b233957b515bb7f504
+    
+    //337203283102542
+    //5bc35a14ed45d2c96bcb446895ea3fa0
+    
+    //125646207511750
+    
+    //アカウント種別の取得
+    ACAccountType *facebookType = [_accountStore accountTypeWithAccountTypeIdentifier:ACAccountTypeIdentifierFacebook];
+    
+    NSMutableDictionary *options = [NSMutableDictionary dictionary];
+    options[ACFacebookAppIdKey] = @"125646207511750";
+    options[ACFacebookPermissionsKey] = @[@"public_actions", @"publish_stream", @"offline_access"];
+    options[ACFacebookAudienceKey] = ACFacebookAudienceOnlyMe;
+    
+    //アカウントの取得
+    [_accountStore requestAccessToAccountsWithType:facebookType
+        options:options
+        completion:^(BOOL granted, NSError *error) {
+            //このcompletionブロックはメインスレッドではないため,UI操作などをするためにメインスレッドで動作するようにする。
+            dispatch_async(dispatch_get_main_queue(), ^{
+            //アカウント認証を許可した場合はgrandtedがYESとなる。
+            //一度設定するとアラート画面がでなくなるので、ユーザー自身で設定画面から変更してもらう必要がある。
+            if (granted) {
+                NSArray *accounts = [_accountStore accountsWithAccountType:facebookType];
+                if (accounts.count > 0) {
+                    if (accounts.count == 1) {
+                        _facebookAccount = accounts[0];
+                    } else {
+                        [self createAccountList:accounts];
+                    }
+                    return;
+                }
+            }
+                
+            //アカウントを許可していない場合。
+            [self showAlert:@"" text:@"Facebookアカウントが登録されていません"];
+            });
+        }];
+}
+
+
+
+//--------------------------------------------------------------------------------------------------
+#pragma mark - Twitter tweet
+
+- (void)initTweetButton
+{
+    [self.tweetButton addTarget:self action:@selector(onTapTweetButton:) forControlEvents:UIControlEventTouchUpInside];
+}
+
+- (void)onTapTweetButton:(id)sender
+{
+    [self createTweetWindow];
+}
+
+- (void)createTweetWindow
+{
+    SLComposeViewController *tweetVC = [SLComposeViewController composeViewControllerForServiceType:SLServiceTypeTwitter];
+    [tweetVC setInitialText:@"つぶやいてみます"];
+    [self presentViewController:tweetVC
+                       animated:YES
+                     completion:^{
+                         
+                     }];
+}
+
+
+
+//--------------------------------------------------------------------------------------------------
+#pragma mark - Facebook Share
+
+- (void)initShareButton
+{
+    [self.shareButton addTarget:self action:@selector(onTapShareButton:) forControlEvents:UIControlEventTouchUpInside];
+}
+
+- (void)onTapShareButton:(id)sender
+{
+    [self createShareWindow];
+}
+
+- (void)createShareWindow
+{
+    SLComposeViewController *shareVC = [SLComposeViewController composeViewControllerForServiceType:SLServiceTypeFacebook];
+    [shareVC setInitialText:@"シェアします"];
+    [self presentViewController:shareVC
+                       animated:YES
+                     completion:^{
+                         
+                     }];
+}
+
+
+
+//--------------------------------------------------------------------------------------------------
+#pragma mark - account list
+
+- (void)createAccountList:(NSArray *)list
+{
+    AccountListViewController *accountListViewController = [[AccountListViewController alloc] initWithAccountList:list];
+    accountListViewController.delegate = self;
+    
+    [self presentViewController:accountListViewController
+                       animated:YES
+                     completion:^{
+                         
+                     }];
+}
+
+
+
+//--------------------------------------------------------------------------------------------------
+#pragma mark - AccountListViewControllerDelegate
+
+- (void)accountListViewController:(AccountListViewController *)viewController
+                 didSelectAccount:(ACAccount *)account
+{
+    NSLog(@"///////////////////");
+    NSLog(@"RootViewController -> アカウント選択完了 アカウント名:%@", account);
+    if (account) {
+        if ([account.accountType isEqual:(ACAccountTypeIdentifierTwitter)]) {
+            NSLog(@"Twitter アカウント");
+            _twitterAccount = account;
+        } else if ([account.accountType isEqual:(ACAccountTypeIdentifierFacebook)]) {
+            NSLog(@"Facebook アカウント");
+            _facebookAccount = account;
+        }
+    }
+}
+
+
+
+
 
 
 
