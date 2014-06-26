@@ -208,10 +208,13 @@
                 //アカウント認証を許可した場合はgrandtedがYESとなる。
                 //一度設定するとアラート画面がでなくなるので、ユーザー自身で設定画面から変更してもらう必要がある。
                 if (granted) {
+                    NSLog(@"allow twitter account");
                     NSArray *accounts = [_accountStore accountsWithAccountType:twitterType];
                     if (accounts.count > 0) {
+                        NSLog(@"has twitter account");
                         if (accounts.count == 1) {
                             _twitterAccount = accounts[0];
+                            [self showAlert:@"get twitter account" text:[NSString stringWithFormat:@"name:%@",_twitterAccount.username]];
                         } else {
                             [self createAccountList:accounts];
                         }
@@ -253,20 +256,13 @@
         return;
     }
     
-    //337191383103732
-    //ab8b63ce9e5a89b233957b515bb7f504
-    
-    //337203283102542
-    //5bc35a14ed45d2c96bcb446895ea3fa0
-    
-    //125646207511750
-    
     //アカウント種別の取得
     ACAccountType *facebookType = [_accountStore accountTypeWithAccountTypeIdentifier:ACAccountTypeIdentifierFacebook];
     
     NSMutableDictionary *options = [NSMutableDictionary dictionary];
-    options[ACFacebookAppIdKey] = @"125646207511750";
-    options[ACFacebookPermissionsKey] = @[@"public_actions", @"publish_stream", @"offline_access"];
+    options[ACFacebookAppIdKey] = @"337191383103732";
+//    options[ACFacebookPermissionsKey] = @[@"public_actions", @"publish_stream", @"offline_access"];
+//    options[ACFacebookPermissionsKey] = @[];
     options[ACFacebookAudienceKey] = ACFacebookAudienceOnlyMe;
     
     //アカウントの取得
@@ -277,7 +273,9 @@
             dispatch_async(dispatch_get_main_queue(), ^{
             //アカウント認証を許可した場合はgrandtedがYESとなる。
             //一度設定するとアラート画面がでなくなるので、ユーザー自身で設定画面から変更してもらう必要がある。
+                NSLog(@"get facebook account");
             if (granted) {
+                NSLog(@"arrow facebook account");
                 NSArray *accounts = [_accountStore accountsWithAccountType:facebookType];
                 if (accounts.count > 0) {
                     if (accounts.count == 1) {
@@ -288,6 +286,8 @@
                     return;
                 }
             }
+                
+                NSLog(@"don't arrow facebook account");
                 
             //アカウントを許可していない場合。
             [self showAlert:@"" text:@"Facebookアカウントが登録されていません"];
@@ -378,6 +378,7 @@
         if ([account.accountType isEqual:(ACAccountTypeIdentifierTwitter)]) {
             NSLog(@"Twitter アカウント");
             _twitterAccount = account;
+            [self showAlert:@"get twitter account" text:[NSString stringWithFormat:@"name:%@",_twitterAccount.username]];
         } else if ([account.accountType isEqual:(ACAccountTypeIdentifierFacebook)]) {
             NSLog(@"Facebook アカウント");
             _facebookAccount = account;
