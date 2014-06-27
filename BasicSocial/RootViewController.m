@@ -9,6 +9,7 @@
 #import "RootViewController.h"
 
 
+NSString *const kFacebookAppID = @"1454427504805342";
 
 
 
@@ -23,6 +24,9 @@
 @property (strong, nonatomic) IBOutlet UIButton *tweetButton;
 @property (strong, nonatomic) IBOutlet UIButton *shareButton;
 @property (strong, nonatomic) IBOutlet UIButton *facebookButton;
+@property (strong, nonatomic) IBOutlet UIButton *sendToLineButton;
+@property (strong, nonatomic) IBOutlet UIButton *facebookPostButton;
+@property (strong, nonatomic) IBOutlet UIButton *twitterPostButton;
 
 @end
 
@@ -106,9 +110,14 @@
     _items = [NSMutableArray array];
     
     [self initTwitterButton];
+    [self initTwitterPostButton];
     [self initTweetButton];
+    
     [self initFacebookButton];
+    [self initFacebookPostButton];
     [self initShareButton];
+    
+    [self initSendToLineButton];
 }
 
 
@@ -116,10 +125,10 @@
 #pragma mark - util
 
 //データ->文字列
-- (NSString *)data2str:(NSData *)data
-{
-    return [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-}
+//- (NSString *)data2str:(NSData *)data
+//{
+//    return [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+//}
 
 - (void)showAlert:(NSString *)title text:(NSString *)text
 {
@@ -131,32 +140,32 @@
     [alert show];
 }
 
-- (void)setIndicator:(BOOL)indicator
-{
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = indicator;
-}
-
-- (UILabel *)makeLabel:(CGRect)rect text:(NSString *)text font:(UIFont *)font
-{
-    UILabel *label = [[UILabel alloc] init];
-    [label setFrame:rect];
-    [label setText:text];
-    [label setFont:font];
-    [label setTextColor:[UIColor blackColor]];
-    [label setBackgroundColor:[UIColor clearColor]];
-    [label setTextAlignment:NSTextAlignmentLeft];
-    [label setNumberOfLines:0];
-    [label setLineBreakMode:NSLineBreakByCharWrapping];
-    return label;
-}
-
-- (UIImageView *)makeImageView:(CGRect)rect image:(UIImage *)image
-{
-    UIImageView *imageView = [[UIImageView alloc] init];
-    [imageView setImage:image];
-    [imageView setFrame:rect];
-    return imageView;
-}
+//- (void)setIndicator:(BOOL)indicator
+//{
+//    [UIApplication sharedApplication].networkActivityIndicatorVisible = indicator;
+//}
+//
+//- (UILabel *)makeLabel:(CGRect)rect text:(NSString *)text font:(UIFont *)font
+//{
+//    UILabel *label = [[UILabel alloc] init];
+//    [label setFrame:rect];
+//    [label setText:text];
+//    [label setFont:font];
+//    [label setTextColor:[UIColor blackColor]];
+//    [label setBackgroundColor:[UIColor clearColor]];
+//    [label setTextAlignment:NSTextAlignmentLeft];
+//    [label setNumberOfLines:0];
+//    [label setLineBreakMode:NSLineBreakByCharWrapping];
+//    return label;
+//}
+//
+//- (UIImageView *)makeImageView:(CGRect)rect image:(UIImage *)image
+//{
+//    UIImageView *imageView = [[UIImageView alloc] init];
+//    [imageView setImage:image];
+//    [imageView setFrame:rect];
+//    return imageView;
+//}
 
 
 
@@ -192,7 +201,8 @@
     
     BOOL isTwitter = [SLComposeViewController isAvailableForServiceType:SLServiceTypeTwitter];
     if (!isTwitter) {
-        [self showAlert:@"Twitterアカウントが\n登録されていません" text:@"設定>Twitter より\nアカウントを登録してください。"];
+        [self showAlert:@"Twitter"
+                   text:@"アカウントが登録されていません。\n設定>Twitter より\nアカウントを登録してください。"];
         return;
     }
     
@@ -205,13 +215,10 @@
         completion:^(BOOL granted, NSError *error) {
             //このcompletionブロックはメインスレッドではないため,UI操作などをするためにメインスレッドで動作するようにする。
             dispatch_async(dispatch_get_main_queue(), ^{
-                //アカウント認証を許可した場合はgrandtedがYESとなる。
-                //一度設定するとアラート画面がでなくなるので、ユーザー自身で設定画面から変更してもらう必要がある。
+                // アカウント認証を許可した場合はgrandtedがYESとなる。
                 if (granted) {
-                    NSLog(@"allow twitter account");
                     NSArray *accounts = [_accountStore accountsWithAccountType:twitterType];
                     if (accounts.count > 0) {
-                        NSLog(@"has twitter account");
                         if (accounts.count == 1) {
                             _twitterAccount = accounts[0];
                             [self showAlert:@"get twitter account" text:[NSString stringWithFormat:@"name:%@",_twitterAccount.username]];
@@ -222,8 +229,9 @@
                     }
                 }
                 
-                //アカウントが登録されていないか、許可していない場合。
-                [self showAlert:@"" text:@"Twitterアカウントが登録されていません"];
+                // アカウントが登録されていないか、許可していない場合。
+                // 一度設定するとアラート画面がでなくなるので、ユーザー自身で設定画面から変更してもらう必要がある。
+                [self showAlert:@"Twitter" text:@"Twitterアカウントが登録されていません"];
             });
         }];
 }
@@ -231,7 +239,49 @@
 
 
 //--------------------------------------------------------------------------------------------------
-#pragma mark - Facebook
+#pragma mark - Post Twitter
+
+- (void)initTwitterPostButton
+{
+    [self.twitterPostButton addTarget:self action:@selector(onTapForPostTwitter:) forControlEvents:UIControlEventTouchUpInside];
+}
+
+- (void)onTapForPostTwitter:(UIView *)sender
+{
+    NSLog(@"onTapForPostTwitter");
+    [self postTwitter];
+}
+
+- (void)postTwitter
+{
+    if (_twitterAccount == nil) {
+        return;
+    }
+    
+    NSURL *url = [NSURL URLWithString:@"https://api.twitter.com/1.1/statuses/update.json"];
+    NSDictionary *prameters = @{@"status": @"tweetします。"};
+    SLRequest *request = [SLRequest requestForServiceType:SLServiceTypeTwitter requestMethod:SLRequestMethodPOST URL:url parameters:prameters];
+    [request setAccount:_twitterAccount];
+    [request performRequestWithHandler:^(NSData *responseData, NSHTTPURLResponse *urlResponse, NSError *error) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            NSInteger statusCode = urlResponse.statusCode;
+            if (statusCode >= 200 && statusCode < 300) {
+                NSDictionary *response = [NSJSONSerialization JSONObjectWithData:responseData options:0 error:nil];
+                NSLog(@"//////////");
+                NSLog(@"Twitter post success : %@", response);
+            } else {
+                NSDictionary *errorResponse = [NSJSONSerialization JSONObjectWithData:responseData options:0 error:nil];
+                NSLog(@"//////////");
+                NSLog(@"Twitter post error : %@", errorResponse);
+            }
+        });
+    }];
+}
+
+
+
+//--------------------------------------------------------------------------------------------------
+#pragma mark - Authentication Facebook
 
 - (void)initFacebookButton
 {
@@ -250,49 +300,172 @@
     
     BOOL isFacebook = [SLComposeViewController isAvailableForServiceType:SLServiceTypeFacebook];
     if (!isFacebook) {
-        [self showAlert:@"Facebookアカウントが\n登録されていません" text:@"設定>Facebook より\nアカウントを登録してください。"];
-        //prefs:root=FACEBOOK
-//        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"prefs://"]];
+        [self showAlert:@"Facebook"
+                   text:@"アカウントが登録されていません。\n設定>Facebook より\nアカウントを登録してください。"];
+        // memo:
+        // アカウント登録されていない場合にsettingのアカウント項目に飛ばすようにしたいが、
+        // どうやらiOS7からできなくなっているよう。
+        // prefs:root=FACEBOOK
+        // [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"prefs://"]];
         return;
     }
     
     //アカウント種別の取得
     ACAccountType *facebookType = [_accountStore accountTypeWithAccountTypeIdentifier:ACAccountTypeIdentifierFacebook];
     
-    NSMutableDictionary *options = [NSMutableDictionary dictionary];
-    options[ACFacebookAppIdKey] = @"337191383103732";
-//    options[ACFacebookPermissionsKey] = @[@"public_actions", @"publish_stream", @"offline_access"];
-//    options[ACFacebookPermissionsKey] = @[];
-    options[ACFacebookAudienceKey] = ACFacebookAudienceOnlyMe;
+    /*
+    // memo:
+    // 上記Facebookアカウントが登録されているかのチェックは以下の方法でも可能。
+    NSArray *accounts = [_accountStore accountsWithAccountType:facebookType];
+    if (accounts.count == 0) {
+        //do something
+        return;
+    }
+     //*/
+    
+    NSDictionary *options = @{ ACFacebookAppIdKey : kFacebookAppID,
+                               ACFacebookAudienceKey : ACFacebookAudienceOnlyMe,
+                               ACFacebookPermissionsKey : @[@"email"] };
     
     //アカウントの取得
     [_accountStore requestAccessToAccountsWithType:facebookType
         options:options
         completion:^(BOOL granted, NSError *error) {
+//            NSDictionary *options2 = @{ ACFacebookAppIdKey : kFacebookAppID,
+//                                       ACFacebookAudienceKey : ACFacebookAudienceOnlyMe,
+//                                       ACFacebookPermissionsKey : @[@"publish_actions"] };
+            
             //このcompletionブロックはメインスレッドではないため,UI操作などをするためにメインスレッドで動作するようにする。
             dispatch_async(dispatch_get_main_queue(), ^{
-            //アカウント認証を許可した場合はgrandtedがYESとなる。
-            //一度設定するとアラート画面がでなくなるので、ユーザー自身で設定画面から変更してもらう必要がある。
+                //アカウント認証を許可した場合はgrandtedがYESとなる。
+                //一度設定するとアラート画面がでなくなるので、ユーザー自身で設定画面から変更してもらう必要がある。
                 NSLog(@"get facebook account");
-            if (granted) {
-                NSLog(@"arrow facebook account");
-                NSArray *accounts = [_accountStore accountsWithAccountType:facebookType];
-                if (accounts.count > 0) {
-                    if (accounts.count == 1) {
-                        _facebookAccount = accounts[0];
-                    } else {
-                        [self createAccountList:accounts];
-                    }
-                    return;
+                if (granted) {
+                    // アカウント使用認証時にスタンダードなパーミッション以外を指定すると、
+                    // 許可が通らないらしい。
+                    // そのため、始めはemailを指定して許可を取った後、再度本当のパーミッションを取りに行く。
+                    // パーミッションの種類については
+                    // https://developers.facebook.com/docs/facebook-login/permissions/v2.0を参照。
+                    [self authenticationPermission];
+                } else {
+                    //アカウントを許可していない場合。
+                    [self showAlert:@"Facebook" text:@"Facebookに許可されていません"];
                 }
-            }
-                
-                NSLog(@"don't arrow facebook account");
-                
-            //アカウントを許可していない場合。
-            [self showAlert:@"" text:@"Facebookアカウントが登録されていません"];
             });
         }];
+}
+
+- (void)authenticationPermission
+{
+//    ACAccountStore *accountStore = [[ACAccountStore alloc] init];
+    
+    //アカウント種別の取得
+    ACAccountType *facebookType = [_accountStore accountTypeWithAccountTypeIdentifier:ACAccountTypeIdentifierFacebook];
+    
+    // publish_actions or publish_stream
+    NSDictionary *options = @{ ACFacebookAppIdKey : kFacebookAppID,
+                               ACFacebookAudienceKey : ACFacebookAudienceOnlyMe,
+                               ACFacebookPermissionsKey : @[@"email", @"publish_actions"] };
+    
+    //アカウントの取得
+    [_accountStore requestAccessToAccountsWithType:facebookType
+        options:options
+        completion:^(BOOL granted, NSError *error) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (granted) {
+                    NSArray *accounts = [_accountStore accountsWithAccountType:facebookType];
+                    _facebookAccount = accounts[0];
+                    [self showAlert:@"get facebook account" text:[NSString stringWithFormat:@"name:%@",_facebookAccount.username]];
+                    NSString *email = [[_facebookAccount valueForKey:@"properties"] objectForKey:@"ACUIDisplayUsername"];
+                    ACAccountCredential *facebookCredential = [_facebookAccount credential];
+                    NSString *accessToken = [facebookCredential oauthToken];
+                    NSLog(@"facebookCredential////\%@",facebookCredential);
+                    NSLog(@"facebookAccessToken////\n%@",accessToken);
+                    NSString *uid = [[_facebookAccount valueForKey:@"properties"] objectForKey:@"uid"];
+                    NSLog(@"facebookID:%@", uid);
+                    [self getPermissions];
+                } else {
+                    //アカウントを許可していない場合。
+                    [self showAlert:@"Facebook" text:@"Permissionが許可されていません"];
+                }
+            });
+        }];
+}
+
+- (void)getPermissions
+{
+    NSString *uid = [[_facebookAccount valueForKey:@"properties"] objectForKey:@"uid"];
+    NSString *urlString = [NSString stringWithFormat:@"https://graph.facebook.com/v2.0/%@/permissions", uid];
+//    ACAccountCredential *facebookCredential = [_facebookAccount credential];
+//    NSString *accessToken = [facebookCredential oauthToken];
+//    NSString *urlString = [NSString stringWithFormat:@"https://graph.facebook.com/v2.0/me?access_token=%@", accessToken];
+    
+    NSURL *url = [NSURL URLWithString:urlString];
+    SLRequest *request = [SLRequest requestForServiceType:SLServiceTypeFacebook
+                                            requestMethod:SLRequestMethodGET
+                                                      URL:url
+                                               parameters:nil];
+    request.account = _facebookAccount;
+//    [request setAccount:_facebookAccount];
+    [request performRequestWithHandler:^(NSData *responseData, NSHTTPURLResponse *urlResponse, NSError *error) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            NSDictionary *response = [NSJSONSerialization JSONObjectWithData:responseData
+                                                                     options:0
+                                                                       error:nil];
+            NSLog(@"facebook get permissions result ///\n %@", response);
+        });
+    }];
+}
+
+
+//--------------------------------------------------------------------------------------------------
+#pragma mark - Post Feed for Facebook
+
+- (void)initFacebookPostButton
+{
+    [self.facebookPostButton addTarget:self action:@selector(onTapForPostFacebook:) forControlEvents:UIControlEventTouchUpInside];
+}
+
+- (void)onTapForPostFacebook:(UIView *)sender
+{
+    [self postFeed];
+}
+
+- (void)postFeed
+{
+    if (_facebookAccount == nil) {
+        return;
+    }
+    
+    NSString *uid = [[_facebookAccount valueForKey:@"properties"] objectForKey:@"uid"];
+    NSString *urlString = [NSString stringWithFormat:@"https://graph.facebook.com/v2.0/%@/feed", uid];
+    NSURL *url = [NSURL URLWithString:urlString];
+    NSDictionary *parameters = @{@"message" : @"投稿してみました。"};
+    SLRequest *request = [SLRequest requestForServiceType:SLServiceTypeFacebook
+                                            requestMethod:SLRequestMethodPOST
+                                                      URL:url
+                                               parameters:parameters];
+    [request setAccount:_facebookAccount];
+    [request performRequestWithHandler:^(NSData *responseData, NSHTTPURLResponse *urlResponse, NSError *error) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            NSUInteger statusCode = urlResponse.statusCode;
+            if (statusCode >= 200 && statusCode < 300) {
+                NSDictionary *response = [NSJSONSerialization JSONObjectWithData:responseData
+                                                                         options:0
+                                                                           error:nil];
+                NSLog(@"facebook post feed result /// %@", response);
+                NSString *resultMessage = [NSString stringWithFormat:@"投稿完了しました。\n%@", response[@"id"]];
+                [self showAlert:@"Facebook" text:resultMessage];
+            } else {
+                NSDictionary *errorResponse = [NSJSONSerialization JSONObjectWithData:responseData
+                                                                              options:0
+                                                                                error:nil];
+                NSLog(@"facebook post feed error /// %@", errorResponse);
+                NSString *errorMessage = [NSString stringWithFormat:@"error:%@", errorResponse[@"error"][@"message"]];
+                [self showAlert:@"Facebook" text:errorMessage];
+            }
+        });
+    }];
 }
 
 
@@ -312,6 +485,9 @@
 
 - (void)createTweetWindow
 {
+    // memo:
+    // アカウントが複数登録されている場合はアカウントを選択できる項目が自動で追加される。
+    // アカウントが登録されていない場合は、
     SLComposeViewController *tweetVC = [SLComposeViewController composeViewControllerForServiceType:SLServiceTypeTwitter];
     [tweetVC setInitialText:@"つぶやいてみます"];
     [self presentViewController:tweetVC
@@ -324,7 +500,7 @@
 
 
 //--------------------------------------------------------------------------------------------------
-#pragma mark - Facebook Share
+#pragma mark - Share Facebook
 
 - (void)initShareButton
 {
@@ -345,6 +521,37 @@
                      completion:^{
                          
                      }];
+}
+
+
+
+//--------------------------------------------------------------------------------------------------
+#pragma mark - Send Line
+
+- (void)initSendToLineButton
+{
+    [self.sendToLineButton addTarget:self action:@selector(onTapSendToLineButton:) forControlEvents:UIControlEventTouchUpInside];
+}
+
+- (void)onTapSendToLineButton:(id)sender
+{
+    [self sendToLine];
+}
+
+- (void)sendToLine
+{
+    NSString *message = @"Lineに送ります。";
+    message = [message stringByAppendingString:@" http://yahoo.co.jp"];
+    message = [message stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+    
+    NSString *urlString = [NSString stringWithFormat:@"line://msg/text/%@", message];
+    NSURL *url = [NSURL URLWithString:urlString];
+    
+    if ([[UIApplication sharedApplication] canOpenURL:url]) {
+        [[UIApplication sharedApplication] openURL:url];
+    } else {
+        [self showAlert:@"" text:@"Lineがインストールされていません"];
+    }
 }
 
 
@@ -375,14 +582,17 @@
     NSLog(@"///////////////////");
     NSLog(@"RootViewController -> アカウント選択完了 アカウント名:%@", account);
     if (account) {
-        if ([account.accountType isEqual:(ACAccountTypeIdentifierTwitter)]) {
-            NSLog(@"Twitter アカウント");
-            _twitterAccount = account;
-            [self showAlert:@"get twitter account" text:[NSString stringWithFormat:@"name:%@",_twitterAccount.username]];
-        } else if ([account.accountType isEqual:(ACAccountTypeIdentifierFacebook)]) {
-            NSLog(@"Facebook アカウント");
-            _facebookAccount = account;
-        }
+        _twitterAccount = account;
+        [self showAlert:@"get twitter account" text:[NSString stringWithFormat:@"name:%@",_twitterAccount.username]];
+//        if ([account.accountType isEqual:(ACAccountTypeIdentifierTwitter)]) {
+//            NSLog(@"///////////////////");
+//            NSLog(@"Twitter アカウント");
+//            _twitterAccount = account;
+//            [self showAlert:@"get twitter account" text:[NSString stringWithFormat:@"name:%@",_twitterAccount.username]];
+//        } else if ([account.accountType isEqual:(ACAccountTypeIdentifierFacebook)]) {
+//            NSLog(@"Facebook アカウント");
+//            _facebookAccount = account;
+//        }
     }
 }
 

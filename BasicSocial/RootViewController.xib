@@ -8,9 +8,12 @@
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="RootViewController">
             <connections>
                 <outlet property="facebookButton" destination="yOP-N4-HEh" id="BpI-fC-wtK"/>
+                <outlet property="facebookPostButton" destination="Px0-fj-zca" id="eRy-Vl-4eU"/>
+                <outlet property="sendToLineButton" destination="g8C-po-bcx" id="TkO-LW-jgY"/>
                 <outlet property="shareButton" destination="gpk-LP-zdW" id="4Os-IR-Qar"/>
                 <outlet property="tweetButton" destination="Mss-O9-elg" id="Xlf-LH-aeg"/>
                 <outlet property="twitterButton" destination="3Ua-4l-RSM" id="eX0-oO-ulF"/>
+                <outlet property="twitterPostButton" destination="9Kv-vc-GBx" id="XzC-W3-uYL"/>
                 <outlet property="view" destination="iN0-l3-epB" id="MoG-l7-vPB"/>
             </connections>
         </placeholder>
@@ -20,30 +23,51 @@
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="3Ua-4l-RSM">
-                    <rect key="frame" x="112" y="20" width="96" height="30"/>
+                    <rect key="frame" x="112" y="37" width="96" height="30"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     <state key="normal" title="twitter access">
                         <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                     </state>
                 </button>
                 <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Mss-O9-elg">
-                    <rect key="frame" x="141" y="58" width="38" height="30"/>
+                    <rect key="frame" x="141" y="113" width="38" height="30"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     <state key="normal" title="tweet">
                         <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                     </state>
                 </button>
                 <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="gpk-LP-zdW">
-                    <rect key="frame" x="140" y="134" width="40" height="30"/>
+                    <rect key="frame" x="140" y="284" width="40" height="30"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     <state key="normal" title="Share">
                         <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                     </state>
                 </button>
                 <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="yOP-N4-HEh">
-                    <rect key="frame" x="100" y="96" width="121" height="30"/>
+                    <rect key="frame" x="100" y="208" width="121" height="30"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     <state key="normal" title="Facebook access">
+                        <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                    </state>
+                </button>
+                <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="g8C-po-bcx">
+                    <rect key="frame" x="123" y="371" width="74" height="30"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                    <state key="normal" title="Lineで送る">
+                        <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                    </state>
+                </button>
+                <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Px0-fj-zca">
+                    <rect key="frame" x="108" y="246" width="104" height="30"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                    <state key="normal" title="Facebook Post">
+                        <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                    </state>
+                </button>
+                <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="9Kv-vc-GBx">
+                    <rect key="frame" x="121" y="75" width="79" height="30"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                    <state key="normal" title="twitter Post">
                         <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                     </state>
                 </button>
